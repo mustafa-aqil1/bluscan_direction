@@ -4,51 +4,6 @@ import android.bluetooth.BluetoothProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.IntentFilter;
-import android.hardware.SensorManager;
-import android.os.ResultReceiver;
-import android.support.v7.app.AppCompatActivity;
-
-
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-
-import android.content.Intent;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
-
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-
-import android.widget.Toast;
-import java.util.ArrayList;
-import java.util.Set;
-
-import android.os.Bundle;
-import android.app.Activity;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.view.Menu;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.TextView;
-
-
-
-
-import android.bluetooth.BluetoothProfile;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.IntentFilter;
-import android.hardware.SensorManager;
-import android.os.ResultReceiver;
 import android.support.v7.app.AppCompatActivity;
 
 
@@ -87,29 +42,14 @@ import android.widget.TextView;
 
 
 public class MainActivity extends Activity {
-    Button b1, b2, b3, b4, b5;
+    Button b1, b2, b3, b4;
     private BluetoothAdapter BA;
     private Set<BluetoothDevice> pairedDevices;
-    ListView lv;
-    int[] rssival = new int[12];
-    int[] rssin = new int[3];
-    int[] rssie = new int[3];
-    int[] rssiw = new int[3];
-    int[] rssis = new int[3];
-    float un;
-    float ue;
-    float uw;
-    float us;
-    int sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0;
-    CharSequence text;
-    float sd1 = 0;
-    float sd2 = 0;
-    int i = 0;
-    float sd3 = 0;
-    float sd4 = 0;
-    Context contex = getApplicationContext();
-    int duration = Toast.LENGTH_SHORT;
-
+      ListView lv;
+    
+    //int dist=0;
+   
+  public int k=0;
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
@@ -125,7 +65,7 @@ public class MainActivity extends Activity {
         b1 = (Button) findViewById(R.id.button);
         b2 = (Button) findViewById(R.id.button2);
         b4 = (Button) findViewById(R.id.button4);
-        b5 = (Button) findViewById(R.id.button5);
+        //b5 = (Button) findViewById(R.id.button5);
 
         BA = BluetoothAdapter.getDefaultAdapter();
         lv = (ListView) findViewById(R.id.listView);
@@ -138,15 +78,15 @@ public class MainActivity extends Activity {
         );
     }
 
-    public void on(View v) {
-        if (!BA.isEnabled()) {
-            Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-            startActivityForResult(turnOn, 0);
-            Toast.makeText(getApplicationContext(), "Turned on", Toast.LENGTH_LONG).show();
-        } else {
-            Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+        public void on(View v){
+            if (!BA.isEnabled()) {
+                Intent turnOn = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                startActivityForResult(turnOn, 0);
+                Toast.makeText(getApplicationContext(), "Turned on", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Already on", Toast.LENGTH_LONG).show();
+            }
         }
-    }
 
     public void off(View v) {
         BA.disable();
@@ -174,132 +114,136 @@ public class MainActivity extends Activity {
 
 
     private final BroadcastReceiver receiver = new BroadcastReceiver() {
-        @Override
+       
+	
+		 @Override
         public void onReceive(Context context, Intent intent) {
-            int dist = 0;
+			 int[] rssival = new int[12];
+    /* int[] rssi1 = new int[3];
+     int[] rssi2 = new int[3];
+     int[] rssi3 = new int[3];
+     int[] rssi4 = new int[3];
+	*/
+	float dist=0,cn=0,ce=0,cw=0,cs=0;
+	float un= 0;
+     float ue=0;
+     float uw=0;
+     float us=0;
+  TextView rssi_msg = (TextView) findViewById(R.id.textView3);
+     int sum1 = 0, sum2 = 0, sum3 = 0, sum4 = 0;
+     CharSequence text;
+     Context contex = getApplicationContext();
+     int duration = Toast.LENGTH_SHORT;
 
             String action = intent.getAction();
+            //if conditions for printing the distance.
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
-                //           String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
+				
+				if(k<13)
+				{
+                 if (k == 0) {
+                     String name = intent.getStringExtra(BluetoothDevice.EXTRA_NAME);
+                     Toast.makeText(contex, name, duration).show();
+                     Toast.makeText(contex, "rssi values @ 1 quadrant", duration).show();
+                } else if (k == 3) {
+                     Toast.makeText(contex, "rssi values @ 2 quadrant", duration).show();
+                } else if (k == 6) {
+                     Toast.makeText(contex, "rssi values @ 3 quadrant", duration).show();
+                } else if (k == 9) {
+                     Toast.makeText(contex, "rssi values @ 4 quadrant", duration).show();
+                } else if (k == 12)
+					{
+                     Toast.makeText(contex, "device found", duration).show();
+                     /*for (int i = 0,j=0; i < 3; i++,j++) {
+                         rssi1[j] = rssival[i];
+                     }
+                     for (int i = 3,j=0; i < 6; i++,j++) {
+                         rssi2[j] = rssival[i];
+                     }
+                     for (int i = 6,j=0; i < 9; i++,j++) {
+                         rssi3[j] = rssival[i];
+                     }
+                     for (int i = 9,j=0; i < 12; i++,j++) {
+                         rssi4[j] = rssival[i];
+                     }
+                     */
 
-                //		for(i=0;i<12;i++)
-
-                if (i == 0) {
-                    text = "rssi values @ 1 quadrant";
-                } else if (i == 3) {
-                    text = "rssi values @ 2 quadrant";
-                } else if (i == 6) {
-                    text = "rssi values @ 3 quadrant";
-                } else if (i == 9) {
-                    text = "rssi values @ 4 quadrant";
-                } else if (i == 12) {
-                    text = "rssi for all directions taken";
-                }
-
-                Toast.makeText(contex, text, duration).show();
 
 
-                rssival[i] = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-
-                text = "value : " + rssival[i];
-                i++;
-                Toast.makeText(contex, text, duration).show();
-            }
-
-        }
-    };
-
-}
+                     for (int i = 0; i <12; i++) {
+                         if (i < 3) {
+                             sum1 += rssival[i];
+                         } else if (i >= 3 && i < 6) {
+                             sum2 += rssival[i];
+                         }
+                         if (i >= 6 && i < 9) {
+                             sum3 += rssival[i];
+                         } else {
+                             sum4 += rssival[i];
+                         }
+                     }
+                     un = -1 * sum1/3;
+                     ue = -1 * sum2/3;
+                     uw = -1 * sum3/3;
+                     us = -1 * sum4/3;
+					 
 /*
-    public void output(View v) {
-
-
-            for (int i = 0,j=0; i < 5; i++,j++)
-                rssin[j] =rssival[i];
-
-            for (int i = 5,j=0; i < 10; i++,j++)
-                rssie[j] = rssival[i];
-
-            for (int i = 10,j=0; i < 15; i++,j++)
-                rssiw[j]=rssival[i];
-
-            for (int i = 15,j=0; i < 20; i++,j++)
-                rssis[j]=rssival[i];
-
-
-
-
             for (int i = 0; i < 5; i++) {
-                sum1 += rssin[i];
-                sum2 += rssie[i];
-                sum3 += rssiw[i];
-                sum4 += rssis[i];
-            }
-            un = -1 * sum1 / 5;
-            ue = -1 * sum2 / 5;
-            uw = -1 * sum3 / 5;
-            us = -1 * sum4 / 5;
-
-            for (int i = 0; i < 5; i++) {
-                sd1 += (float) Math.pow(rssin[i] - un, 2);
-                sd2 += (float) Math.pow(rssie[i] - ue, 2);
-                sd3 += (float) Math.pow(rssiw[i] - uw, 2);
-                sd4 += (float) Math.pow(rssis[i] - us, 2);
+                sd1 += (float) Math.pow(rssi1[i] - un, 2);
+                sd2 += (float) Math.pow(rssi2[i] - ue, 2);
+                sd3 += (float) Math.pow(rssi3[i] - uw, 2);
+                sd4 += (float) Math.pow(rssi4[i] - us, 2);
             }
             sd1 = (float) Math.sqrt(sd1 / 5);
             sd2 = (float) Math.sqrt(sd2 / 5);
             sd3 = (float) Math.sqrt(sd3 / 5);
             sd4 = (float) Math.sqrt(sd4 / 5);
-
-            if (un > ue && un > uw && un > us) {
-                text = "device is in north direction";
-                Toast.makeText(contex, text, duration).show();
-            } else if (ue > un && ue > uw && ue > us) {
-                text = "device is in east direction";
-                Toast.makeText(contex, text, duration).show();
-            } else if (uw > ue && uw > un && uw > us) {
-                text = "device is in west direction";
-                Toast.makeText(contex, text, duration).show();
-            } else
-
-            {
-                text = "device is in south direction";
-                Toast.makeText(contex, text, duration).show();
-            }
-
-        }
 */
-//    public void BroadcastReceiver(View view) {
- //   }
+                     if (un > ue && un > uw && un > us) {
+                         text = "device is in 1st quadrant";
+                        // Toast.makeText(contex, text, duration).show();
+						rssi_msg.setText(rssi_msg.getText() + text);
+						cn++;
+                     } else if (ue > un && ue > uw && ue > us) {
+                         text = "device is in 2nd quadrant";
+                         //Toast.makeText(contex, text, duration).show();
+						rssi_msg.setText(rssi_msg.getText() + text);
+						ce++;
+					 } else if (uw > ue && uw > un && uw > us) {
+                         text = "device is in 3rd quadrant";
+						 rssi_msg.setText(rssi_msg.getText() + text);
+                         //Toast.makeText(contex, text, duration).show();
+							cw++;
+						 } else
 
-    //close Range
-               /* float meansd;
-                meansd=(sd1+sd2+sd3+sd4)/4;
-                if(meansd<2) {
-                    text = "DEVICE IS IN CLOSE RANGE";
-                    Toast.makeText(contex, text, duration).show();
-                } */
-
-
-             /* public  class rssit
-                {int rssival[5];
-
-				int returnrssi()
-				{
-
-						for (int i = 0; i < 5; i++)
-                        rssival[i] = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
-						for(i=0;i<5;i++)
-					{
-
-						return rssival[i];
-				}
-				}
-				} */
-
-
-               /* if(rssi>-45) {
-                    dist=0;
+                     {
+                         text = "device is in 4th quadrant";
+						 rssi_msg.setText(rssi_msg.getText() + text);
+                         //Toast.makeText(contex, text, duration).show();
+                     cs++;
+					 }
+					 
+					 if(cn==1)
+					 {
+						 rssi= -1*un;
+					 }
+					 else
+						 if(ce==1)
+					 {
+						 rssi=-1*ue;
+					 }
+					 else
+						 if(cw==1)
+					 {
+						 rssi=-1*uw;
+					 }
+					 else
+					 {
+						 rssi=-1*us;
+					 }
+						 
+				if(rssi>-45) {
+                   dist=0;
                 }
                 else
                 if(-45>rssi && rssi>=-48)
@@ -330,16 +274,41 @@ public class MainActivity extends Activity {
                     dist=9;
                 else
                 if(-80>rssi)
-                    dist=10;*/
-
-
-        //  TextView rssi_msg = (TextView) findViewById(R.id.textView3);
-        //rssi_msg.setText(rssi_msg.getText() + name + " => " + rssi + "dBm\nDistance =" + dist +" metres\n");  //to print the rssi value.
-
-
-
-
+                    dist=10;
+				
+				
+				rssi_msg.setText(rssi_msg.getText() + "distance"+dist +" metres\n");				
+                }
+				
+				}
 
 
 
+                rssival[k] = intent.getShortExtra(BluetoothDevice.EXTRA_RSSI, Short.MIN_VALUE);
+
+                text = "value : " + rssival[k];
+                k++;
+                Toast.makeText(contex, text, duration).show();
+
+
+
+
+                //TextView rssi_msg = (TextView) findViewById(R.id.textView3);
+               // rssi_msg.setText(rssi_msg.getText() + name + " => " + rssi + "dBm\nDistance =" + dist +" metres\n");  //to print the rssi value.
+
+
+
+
+
+
+            }
+        }
+    };
+
+
+			//public void output(View v) {}
+
+
+	
+}
 
